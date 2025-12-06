@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>MTG Commander Availability</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #111;
+      color: #eee;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 70%;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      margin-left: 6px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>MTG Commander Checker</h1>
+  <p>Type a commander name to see if it's taken.</p>
+
+  <input id="nameInput" type="text" placeholder="e.g. The Ur-Dragon">
+  <button onclick="checkCommander()">Check</button>
+
+  <div id="result"></div>
+
+  <script>
+    const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
+
+    async function checkCommander() {
+      const name = document.getElementById("nameInput").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!name) {
+        resultDiv.textContent = "Please enter a commander name.";
+        return;
+      }
+
+      resultDiv.textContent = "Checking...";
+
+      try {
+        const response = await fetch(API_URL + "?name=" + encodeURIComponent(name));
+        const data = await response.json();
+
+        if (data.taken) {
+          resultDiv.textContent = `${data.commander} is taken by ${data.player}`;
+        } else {
+          resultDiv.textContent = `${name} is available ✅`;
+        }
+      } catch (err) {
+        console.error(err);
+        resultDiv.textContent = "Error checking commander.";
+      }
+    }
+
+    document.getElementById("nameInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") checkCommander();
+    });
+  </script>
+
+</body>
+</html>
