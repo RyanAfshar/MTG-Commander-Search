@@ -38,39 +38,46 @@
 
   <div id="result"></div>
 
-  <script>
-    const API_URL = "PASTE_YOUR_GOOGLE_SCRIPT_URL_HERE";
+<script>
+  const API_URL = "YOUR_WEB_APP_URL_HERE"; // keep whatever you already had
 
-    async function checkCommander() {
-      const name = document.getElementById("nameInput").value.trim();
-      const resultDiv = document.getElementById("result");
+  async function checkCommander() {
+    const name = document.getElementById("nameInput").value.trim();
+    const resultDiv = document.getElementById("result");
 
-      if (!name) {
-        resultDiv.textContent = "Please enter a commander name.";
-        return;
-      }
-
-      resultDiv.textContent = "Checking...";
-
-      try {
-        const response = await fetch(API_URL + "?name=" + encodeURIComponent(name));
-        const data = await response.json();
-
-        if (data.taken) {
-          resultDiv.textContent = `${data.commander} is taken by ${data.player}`;
-        } else {
-          resultDiv.textContent = `${name} is available ✅`;
-        }
-      } catch (err) {
-        console.error(err);
-        resultDiv.textContent = "Error checking commander.";
-      }
+    if (!name) {
+      resultDiv.textContent = "Please enter a commander name.";
+      return;
     }
 
-    document.getElementById("nameInput").addEventListener("keydown", e => {
-      if (e.key === "Enter") checkCommander();
-    });
-  </script>
+    resultDiv.textContent = "Checking...";
+
+    try {
+      const response = await fetch(API_URL + "?name=" + encodeURIComponent(name));
+      const data = await response.json();
+
+      if (data.taken) {
+        // If fuzzy is true, we guessed the closest match
+        if (data.fuzzy) {
+          resultDiv.textContent =
+            `${data.commander} is taken by ${data.player} ` +
+            `(closest match for "${data.query}")`;
+        } else {
+          resultDiv.textContent = `${data.commander} is taken by ${data.player}`;
+        }
+      } else {
+        resultDiv.textContent = `${data.query} is available ✅`;
+      }
+    } catch (err) {
+      console.error(err);
+      resultDiv.textContent = "Error checking commander.";
+    }
+  }
+
+  document.getElementById("nameInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") checkCommander();
+  });
+</script>
 
 </body>
 </html>
